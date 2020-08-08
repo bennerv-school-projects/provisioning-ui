@@ -1,8 +1,7 @@
 import React from 'react';
 import './SaaSTable.css';
-import 'bootstrap-css-only/css/bootstrap.min.css';
-import 'mdbreact/dist/css/mdb.css';
 import { MDBBtn, MDBTable, MDBTableHead, MDBTableBody } from 'mdbreact';
+import { isNullOrUndefined } from 'util';
 
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -27,7 +26,6 @@ class SaaSTable extends React.Component {
               isLoaded: true,
               items: result
             });
-            console.log(result)
           },
 
           (error) => {
@@ -41,10 +39,6 @@ class SaaSTable extends React.Component {
 
   }
 
-  loadData() {
-
-  }
-
   render() {
     const { isLoaded } = this.state;
 
@@ -53,15 +47,19 @@ class SaaSTable extends React.Component {
     } else {
       let tableData = this.generateTableData()
       return (
-        <MDBTable
-          striped
-          bordered
-          hover
-          btn
-          responsiveMd>
-          <MDBTableHead columns={tableData.columns} />
-          <MDBTableBody rows={tableData.rows} />
-        </MDBTable>
+        <div id="saasTable">
+          <MDBTable
+            responsive
+            striped
+            bordered
+            hover
+            btn
+          >
+            <MDBTableHead columns={tableData.columns} />
+            <MDBTableBody rows={tableData.rows} />
+          </MDBTable>
+
+        </div>
       );
     }
   }
@@ -125,6 +123,16 @@ class SaaSTable extends React.Component {
     let rows = [];
     for (let i in this.state.items) {
       let saas = this.state.items[i];
+      let namespace = saas.name
+      let status = saas.status
+      let disabled = true
+      if (!isNullOrUndefined(status)) {
+        if (status === "Completed" || status === "Failed") {
+          disabled = false
+        }
+      }
+
+
       rows.push({
         saasName: saas.name,
         saasStatus: saas.status,
@@ -132,7 +140,17 @@ class SaaSTable extends React.Component {
         saasUsername: saas.username,
         saasPassword: saas.password,
         saasUrl: saas.saasUrl,
-        manage: <div><MDBBtn color="red" size="sm"><i className="fa fa-edit" />Delete</MDBBtn></div>
+        manage: <div>
+          <MDBBtn
+            onClick={() => {
+              this.deleteByNamespace(namespace);
+            }}
+            disabled={disabled}
+            color="danger"
+            size="sm">
+            Delete
+            </MDBBtn>
+        </div>
       });
     }
     data.rows = rows;
@@ -141,7 +159,12 @@ class SaaSTable extends React.Component {
 
   deleteByNamespace(namespace) {
     this.setState({ isLoading: true });
-    // TODO: Delete the namespace 
+    fetch(apiUrl + "/v1/saas", {
+      method: 'DELETE',
+      body: JSON.stringify({ "namespace": namespace })
+    })
+      .then(res => res.text())
+      .then(res => console.log(res))
   }
 
 
