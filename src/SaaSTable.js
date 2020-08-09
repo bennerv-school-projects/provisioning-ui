@@ -127,7 +127,7 @@ class SaaSTable extends React.Component {
       let status = saas.status
       let disabled = true
       if (!isNullOrUndefined(status)) {
-        if (status === "Completed" || status === "Failed") {
+        if (status === "Completed" || status === "Failed" || status === "Deleting") {
           disabled = false
         }
       }

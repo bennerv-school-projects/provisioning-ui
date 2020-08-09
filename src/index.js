@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import SaaSTable from './SaaSTable';
+import SaaSCreator from './SaaSCreator';
 import * as serviceWorker from './serviceWorker';
 import NavBar from './NavBar';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -12,6 +13,7 @@ ReactDOM.render(
   <React.StrictMode>
     <NavBar />
     <SaaSTable />
+    <SaaSCreator />
   </React.StrictMode>,
   document.getElementById('root')
 );
