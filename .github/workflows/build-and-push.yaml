@@ -1,0 +1,34 @@
+name: Node.js Build Docker Image
+
+on:
+  release:
+    types: [created, edited]
+env:
+  IMAGE_NAME: bennerv/provisioning-ui
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.3]
+
+    steps:
+    - uses: actions/checkout@v2  
+    - name: Build image
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      env:
+        RELEASE: ${{ github.ref }}
+      
+    - name: Login to registry
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login docker.io -u bennerv --password-stdin
+
+    - name: Push Image
+      run: |        
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Retag & Push image
+        docker tag $IMAGE_NAME $IMAGE_NAME:$VERSION
+        docker push $IMAGE_NAME:$VERSION
