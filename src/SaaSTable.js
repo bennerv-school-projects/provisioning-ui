@@ -139,7 +139,7 @@ class SaaSTable extends React.Component {
         saasError: saas.error,
         saasUsername: saas.username,
         saasPassword: saas.password,
-        saasUrl: saas.saasUrl,
+        saasUrl: saas.url,
         manage: <div>
           <MDBBtn
             onClick={() => {
